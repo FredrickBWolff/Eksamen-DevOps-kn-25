@@ -1,0 +1,44 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: eu-west-1
+  ECR_REPOSITORY: fb-eksamen2026-25
+  DOCKERHUB_REPOSITORY: wishifai
+
+permissions:
+  contents: read
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr_login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Login to Docker hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: echo "$DOCKER_TOKEN" | docker login --username "$DOCKER_USERNAME" --password-stdin
+
+      - name: Build and push
+        env:
+          ECR_IMAGE: ${{ steps.ecr_login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          DOCKERHUB_IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
+        run: |
+          docker build -t "$ECR_IMAGE" -t "$DOCKERHUB_IMAGE" .
+          docker push "$ECR_IMAGE"
+          docker push "$DOCKERHUB_IMAGE"
