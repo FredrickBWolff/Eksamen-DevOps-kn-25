@@ -36,9 +36,12 @@ jobs:
 
       - name: Build and push
         env:
-          ECR_IMAGE: ${{ steps.ecr_login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          DOCKERHUB_IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
+          REGISTRY: ${{ steps.ecr_login.outputs.registry }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
-          docker build -t "$ECR_IMAGE" -t "$DOCKERHUB_IMAGE" .
-          docker push "$ECR_IMAGE"
-          docker push "$DOCKERHUB_IMAGE"
+          rev=$(git rev-parse --short HEAD)
+          ECR_IMAGE="$REGISTRY/$ECR_REPOSITORY"
+          DOCKERHUB_IMAGE="$DOCKER_USERNAME/$DOCKERHUB_REPOSITORY"
+          docker build -t "$ECR_IMAGE:$rev" -t "$ECR_IMAGE:latest" -t "$DOCKERHUB_IMAGE:$rev" -t "$DOCKERHUB_IMAGE:latest" .
+          docker push --all-tags "$ECR_IMAGE"
+          docker push --all-tags "$DOCKERHUB_IMAGE"
