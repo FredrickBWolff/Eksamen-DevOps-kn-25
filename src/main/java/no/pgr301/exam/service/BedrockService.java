@@ -1,6 +1,7 @@
 package no.pgr301.exam.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.annotation.Timed;
 import no.pgr301.exam.model.GiftAnalysis;
 import no.pgr301.exam.model.GiftSuggestion;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,7 @@ public class BedrockService {
      * @param labels
      * @return
      */
+    @Timed ("bedrock.suggestGifts")
     public GiftAnalysis suggestGifts(List<String> labels) {
         String prompt = """
                 Du er en gaveassistent. Du får en liste med objekter som Rekognition
@@ -78,6 +80,7 @@ public class BedrockService {
 
                 Svar KUN med gyldig JSON på dette formatet:
                 {
+                  "roomType": "et av disse ordene som sier om hva slags rom dette er: stue, barnerom, garasje, eller 'En ukjent rom type' hvis du ikke klarer å bestemme",
                   "roomAnalysis": "kort beskrivelse av rommet og hva det signaliserer",
                   "recipientProfile": "antagelser om personen (alder, interesser, livssituasjon)",
                   "suggestions": [
@@ -105,6 +108,7 @@ public class BedrockService {
             return MAPPER.readValue(json, GiftAnalysis.class);
         } catch (Exception e) {
             return new GiftAnalysis(
+                    "En ukjent rom type",
                     "(ukjent)",
                     "(kunne ikke parse svar)",
                     List.of(new GiftSuggestion("(ukjent format)", text))

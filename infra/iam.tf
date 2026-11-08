@@ -33,6 +33,11 @@ resource "aws_iam_role_policy" "task" {
         Effect   = "Allow"
         Action   = ["bedrock:InvokeModel"]
         Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
+        Resource = "*"
       }
     ]
   })

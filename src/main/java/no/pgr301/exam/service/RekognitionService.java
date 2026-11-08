@@ -1,6 +1,7 @@
 package no.pgr301.exam.service;
 
 import org.springframework.stereotype.Service;
+import io.micrometer.core.annotation.Timed;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
@@ -19,6 +20,7 @@ public class RekognitionService {
         this.client = client;
     }
 
+    @Timed ("rekognition.detectLabels")
     public List<String> detectLabels(byte[] bytes) {
         DetectLabelsResponse resp = client.detectLabels(DetectLabelsRequest.builder()
                 .image(Image.builder().bytes(SdkBytes.fromByteArray(bytes)).build())

@@ -29,7 +29,7 @@ public class MetricsConfig {
 
             @Override
             public String namespace() {
-                return "";
+                return "wishifai-kn-25";
             }
 
             @Override
