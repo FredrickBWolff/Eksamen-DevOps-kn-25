@@ -17,3 +17,8 @@ variable "image_tag" {
   type    = string
   default = "b637dc7"
 }
+
+variable "metric_namespace" {
+  type    = string
+  default = "wishifai-kn-25"
+}
