@@ -24,6 +24,12 @@ curl -F "image=@samples/sample_image.png" http://localhost:9999/api/analyze
 ## 1B
 Workflowen kjører kun ved push til main. Den bygger containerimaget og pusher det til ECR og Docker Hub. AWS-nøkler og innloggingsinformasjon til Docker Hub hentes fra GitHub Secrets.
 
+### Docker hub
+Imaget kan hentes med:
+```bash
+docker pull frwo006/wishifai:latest
+```
+
 ### Begrunnelse for tagging-strategi
 Jeg bruker short-sha slik at imaget kan knyttes til commiten det ble bygget fra. Det er enklere enn å lese en full-sha, og sannsynligheten for at to tagger blir like er liten i et prosjekt på denne størrelsen.
 
